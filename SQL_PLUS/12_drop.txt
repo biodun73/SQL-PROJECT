@@ -1,0 +1,19 @@
+/*drop table*/audit_tickets
+
+ALTER TABLE tickets DROP CONSTRAINT fk_travellers;
+ALTER TABLE tickets DROP CONSTRAINT fk_holidays;
+
+ALTER TABLE tickets DROP CONSTRAINT pk_tickets;
+ALTER TABLE travellers DROP CONSTRAINT  pk_travellers;
+ALTER TABLE holidays DROP CONSTRAINT pk_holidays
+
+DROP TABLE tickets;
+DROP TABLE holidays;
+DROP TABLE travellers;
+DROP TABLE addresses;
+DROP TYPE address_type;
+DROP SEQUENCE seq_ticket;
+DROP SEQUENCE seq_hol;
+DROP SEQUENCE seq_num;
+
+purge recyclebin; 

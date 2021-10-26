@@ -1,0 +1,402 @@
+SET SERVEROUTPUT ON;
+
+--create sequence number
+
+CREATE SEQUENCE seq_num;
+CREATE SEQUENCE seq_hol;
+CREATE SEQUENCE seq_ticket;
+
+--create address type for traveller table 
+
+CREATE TYPE addres_type AS OBJECT(
+  address VARCHAR2(50), 
+  city VARCHAR2(50), 
+  country VARCHAR2(50)
+);
+/ 
+
+CREATE TYPE person_type AS OBJECT(
+  firstname VARCHAR2(50), 
+  lastname VARCHAR2(50), 
+  email VARCHAR2(50), 
+  gender VARCHAR2(50)
+);
+/ 
+--create table address_object of ADDRESS for traveller table
+
+CREATE TABLE address_object OF addres_type;
+
+--create table person_object of PERSON for traveller table
+
+CREATE TABLE person_object OF person_type;
+
+INSERT INTO address_object(address, city, country) 
+VALUES 
+  (
+    'Stuart Parkway 10', 'Mendes', 'Brazil'
+  );
+
+--insert data into address_type for travellers
+
+INSERT INTO address_object(address, city, country) 
+VALUES 
+  (
+    'Jaque Crescent 20', 'Paris', 'France'
+  );
+
+INSERT INTO person_object(
+  firstname, lastname, email, gender
+) 
+VALUES 
+  (
+    'Caren', 'Caen', 'ccaen0@nbcnews.com', 
+    'Genderfluid'
+  );
+
+INSERT INTO person_object(
+  firstname, lastname, email, gender
+) 
+VALUES 
+  (
+    'Sebastiano', 'Kaesmans', 'skaesmans1@pcworld.com', 
+    'Female'
+  );
+
+--Retrieving the OID from a specific row
+
+SELECT 
+  REF(a), 
+  address, 
+  city, 
+  country 
+FROM 
+  address_object a 
+WHERE 
+  address = 'Stuart Parkway 10';
+
+--insert into travellers table
+
+CREATE TABLE travellers (
+  trav_id NUMBER(5), 
+  person_data REF person_type SCOPE IS person_object, 
+  address REF addres_type SCOPE IS address_object, 
+  travel_date DATE
+);
+
+--create holiday table for travellers
+
+CREATE TABLE holidays (
+  holiday_id NUMBER(5), 
+  city VARCHAR(50), 
+  country VARCHAR(50)
+);
+
+--create table tickets for travellers
+
+CREATE TABLE tickets (
+  ticket_id NUMBER(5), 
+  trav_id NUMBER(5), 
+  holiday_id NUMBER(5), 
+  ticket_price NUMBER(5, 2), 
+  flight_number VARCHAR2(255), 
+  flight_date DATE
+);
+
+ALTER TABLE 
+  tickets 
+ADD 
+  CONSTRAINT pk_tickets PRIMARY KEY(ticket_id);
+ALTER TABLE 
+  holidays 
+ADD 
+  CONSTRAINT pk_holidays PRIMARY KEY(holiday_id);
+ALTER TABLE 
+  travellers 
+ADD 
+  CONSTRAINT pk_travellers PRIMARY KEY(trav_id);
+
+--foreign key contraints
+
+ALTER TABLE 
+  tickets 
+ADD 
+  CONSTRAINT fk_travellers FOREIGN KEY(trav_id) references travellers(trav_id);
+ALTER TABLE 
+  tickets 
+ADD 
+  CONSTRAINT fk_holidays FOREIGN KEY(holiday_id) references holidays(holiday_id);
+
+--insert into travellers table
+
+INSERT INTO travellers (trav_id, travel_date) 
+VALUES 
+  (seq_num.NEXTVAL, '06-Nov-2020');
+
+INSERT INTO travellers (trav_id, travel_date) 
+VALUES 
+  (seq_num.NEXTVAL, '06-Dec-2020');
+UPDATE 
+  travellers 
+SET 
+  person_data = (
+    SELECT 
+      REF(p) 
+    FROM 
+      person_obect p 
+    WHERE 
+      p.firstname = 'Don'
+  )
+
+ --insert into holidays table
+
+  INSERT INTO holidays (holiday_id, city, country) 
+VALUES 
+  (
+    seq_hol.NEXTVAL, 'Caucaguita', 'Venezuela'
+  );
+
+INSERT INTO holidays (holiday_id, city, country) 
+VALUES 
+  (
+    seq_hol.NEXTVAL, 'Pniewy', 'Poland'
+  );
+
+--insert into ticket
+
+INSERT INTO tickets (
+  ticket_id, trav_id, holiday_id, ticket_price, 
+  flight_number, flight_date
+) 
+VALUES 
+  (
+    seq_ticket.NEXTVAL, seq_num.CURRVAL, 
+    seq_hol.CURRVAL, 630.53, 25481, '10-Sep-2020'
+  );
+
+INSERT INTO tickets (
+  ticket_id, trav_id, holiday_id, ticket_price, 
+  flight_number, flight_date
+) 
+VALUES 
+  (
+    seq_ticket.NEXTVAL, seq_num.CURRVAL, 
+    seq_hol.CURRVAL, 632.05, 25485, '06-Sep-2020'
+  );
+
+--increase in price ticket
+
+CREATE PROCEDURE increase_price(
+  ticket_id_in IN tickets.ticket_id % TYPE, 
+  increase_pct_in IN NUMBER
+) 
+IS
+ BEGIN FOR ticket_rec IN (
+  SELECT 
+    ticket_id 
+  FROM 
+    tickets 
+  WHERE 
+    ticket_id = increase_price.ticket_id_in
+) 
+LOOP 
+
+UPDATE 
+  tickets tic 
+SET 
+  tic.ticket_price = tic.ticket_price + tic.ticket_price * increase_price.increase_pct_in 
+WHERE 
+  tic.ticket_id = ticket_rec.ticket_id;
+END LOOP;
+END increase_price;
+
+/ 
+
+EXECUTE increase_price (1, 0.1);
+
+SELECT 
+  ticket_price, 
+  flight_number 
+FROM 
+  tickets 
+ORDER BY 
+  flight_number DESC;
+
+--create procedure
+
+CREATE PROCEDURE increase_price2 (
+  ticket_id_in IN tickets.ticket_id % TYPE, 
+  increase_pct_in IN NUMBER
+) 
+
+IS
+ BEGIN 
+UPDATE 
+  tickets tic 
+SET 
+  tic.ticket_price = tic.ticket_price + tic.ticket_price * increase_price2.increase_pct_in 
+WHERE 
+  tic.ticket_id = increase_price2.ticket_id_in;
+END increase_price2;
+/
+
+ EXECUTE increase_price2 (2, 0.2);
+
+SELECT 
+  ticket_price, 
+  flight_number 
+FROM 
+  tickets 
+ORDER BY 
+  flight_number DESC;
+
+--create function that give discount
+
+CREATE FUNCTION traveller(
+  ticket IN number, discount IN number
+) 
+RETURN 
+
+number IS total NUMBER(5);
+
+BEGIN 
+total := ticket - discount;
+return total;
+end;
+/ 
+
+DECLARE total NUMBER(5);
+BEGIN total := traveller(540, 50);
+DBMS_OUTPUT.PUT_LINE('The new discount is: ' || total);
+END;
+/ 
+--create discount using trigger
+
+CREATE OR REPLACE TRIGGER trig_ticket_changes BEFORE DELETE 
+OR INSERT OR UPDATE 
+  ON tickets 
+FOR EACH ROW WHEN (NEW.ticket_id > 0) DECLARE tik_diff number;
+BEGIN tik_diff := : NEW.ticket_price - : OLD.ticket_price;
+
+dbms_output.put_line(
+  'Old.ticket_price: ' || : OLD.ticket_price
+);
+
+dbms_output.put_line(
+  'New ticket_price: ' || : NEW.ticket_price
+);
+
+dbms_output.put_line(
+  'ticket_price difference: ' || tik_diff
+);
+END;
+/ 
+--create new ticket after insert data
+
+INSERT INTO tickets (
+  ticket_id, trav_id, holiday_id, ticket_price, 
+  flight_number, flight_date
+) 
+VALUES 
+  (
+    seq_ticket.NEXTVAL, seq_num.CURRVAL, 
+    seq_hol.CURRVAL, 450.05, 25473, '29-Dec-2021'
+  );
+
+INSERT INTO tickets (
+  ticket_id, trav_id, holiday_id, ticket_price, 
+  flight_number, flight_date
+) 
+VALUES 
+  (
+    seq_ticket.NEXTVAL, seq_num.CURRVAL, 
+    seq_hol.CURRVAL, 490.05, 25473, '29-Dec-2021'
+  );
+
+--update ticket 
+
+UPDATE 
+  tickets 
+SET 
+  ticket_price = ticket_price + 30 
+WHERE 
+  ticket_id = 1;
+UPDATE 
+  tickets 
+SET 
+  ticket_price = ticket_price + 25 
+WHERE 
+  ticket_id = 2;
+
+--select new ticket discount from ticket table after using trigger
+
+SELECT 
+  * 
+FROM 
+  tickets;
+
+--use cursor to create new discount for ticket
+
+DECLARE ticket_rows number(5, 2);
+BEGIN 
+UPDATE 
+  tickets 
+SET 
+  ticket_price = ticket_price - 30;
+IF sql % notfound THEN dbms_output.put_line('no tickets selected');
+ELSIF sql % found THEN ticket_rows := sql % rowcount;
+dbms_output.put_line(
+  ticket_rows || ' tickets selected '
+);
+END IF;
+END;
+/ 
+
+DROP 
+  TRIGGER trig_ticket_changes;
+DROP 
+  FUNCTION traveller;
+DROP 
+  PROCEDURE increase_price2;
+DROP 
+  PROCEDURE increase_price;
+ALTER TABLE 
+  tickets 
+DROP 
+  CONSTRAINT fk_travellers;
+ALTER TABLE 
+  tickets 
+DROP 
+  CONSTRAINT fk_holidays;
+ALTER TABLE 
+  tickets 
+DROP 
+  CONSTRAINT pk_tickets;
+ALTER TABLE 
+  travellers 
+DROP 
+  CONSTRAINT pk_travellers;
+ALTER TABLE 
+  holidays 
+DROP 
+  CONSTRAINT pk_holidays;
+DROP 
+  TABLE tickets;
+DROP 
+  TABLE holidays;
+DROP 
+  TABLE travellers;
+DROP 
+  TABLE person_object;
+DROP 
+  TABLE address_object;
+DROP 
+  TYPE person_type;
+DROP 
+  TYPE addres_type;
+DROP 
+  SEQUENCE seq_ticket;
+DROP 
+  SEQUENCE seq_hol;
+DROP 
+  SEQUENCE seq_num;
+purge recyclebin;

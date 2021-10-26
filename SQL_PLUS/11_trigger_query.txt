@@ -1,0 +1,3 @@
+
+/*select new ticket discount from ticket table*/
+SELECT * FROM tickets;

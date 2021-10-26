@@ -1,0 +1,9 @@
+
+SELECT * FROM travellers;
+SELECT * FROM holidays;
+SELECT * FROM tickets;
+
+/'query using WHERE*/
+
+SELECT * FROM travellers WHERE trav_id = 1;
+SELECT * FROM holidays WHERE holiday_id = 1;

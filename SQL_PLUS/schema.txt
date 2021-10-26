@@ -1,0 +1,415 @@
+SET SERVEROUTPUT ON;
+
+/*create sequence number */
+
+CREATE SEQUENCE seq_num;
+
+CREATE SEQUENCE seq_hol;
+
+CREATE SEQUENCE seq_ticket;
+
+
+/*create address type for traveller table */
+
+CREATE TYPE address_type AS OBJECT(
+       address VARCHAR2(50),
+       city VARCHAR2(50),
+       country VARCHAR2(50)
+);
+/
+
+/*create table addres of address_type for traveller table*/
+
+CREATE TABLE addres OF address_type;
+
+/*insert data into address_type for travellers*/
+
+INSERT INTO addres(
+           address,
+            city,
+          country
+        )
+          VALUES('45 Stuart Parkway','Mendes','Brazil');
+
+/*insert data into address_type for travellers*/
+
+INSERT INTO addres(
+           address,
+            city,
+          country
+        )
+          VALUES('10 Jaque Crescent','Paris','France');
+
+/*Querying an object table*/
+
+SELECT
+      city,
+     country
+FROM
+       addres
+;
+
+/*Retrieving the OID and a few columns from an object table on a specific row*/
+
+SELECT
+       REF(a)
+     , address
+     , city
+     , country
+FROM
+       addres a
+WHERE
+       address = '10 Jaque Crescent'
+;
+        
+CREATE TYPE travellers_type
+AS
+    OBJECT
+    (
+         first_name  VARCHAR2(20)
+        ,last_name  VARCHAR2(20));
+/
+
+CREATE TABLE travellers_table OF travellers_type;
+
+
+INSERT INTO travellers_table
+       (
+             first_name,
+             last_name
+       )
+       VALUES
+       (
+            'Jones','John'
+       )
+;
+
+INSERT INTO travellers_table
+       (
+             first_name,
+             last_name
+       )
+       VALUES
+       (
+           'Mark','Silas'
+       )
+;
+
+
+CREATE TABLE travellers
+  (
+     trav_id     NUMBER(5),
+     first_name  VARCHAR2(50),
+     last_name   VARCHAR2(50),
+     email       VARCHAR2(50),
+     gender      VARCHAR2(50),
+     address     address_type,
+     travel_date DATE
+  );
+
+/*create holiday table for travellers*/
+
+CREATE TABLE holidays
+  (
+     holiday_id NUMBER(5),
+     city          VARCHAR(50),
+     country       VARCHAR(50)
+  );
+
+/*create table tickets for travvelrs*/
+
+CREATE TABLE tickets
+  (
+             ticket_id NUMBER(5),
+             trav_id NUMBER(5),
+             holiday_id NUMBER(5),
+             ticket_price NUMBER(5,2),
+             flight_number VARCHAR2(255),
+             flight_date DATE
+ );
+
+
+ALTER TABLE tickets ADD CONSTRAINT pk_tickets PRIMARY KEY(ticket_id);
+ALTER TABLE holidays ADD CONSTRAINT pk_holidays PRIMARY KEY(holiday_id);
+ALTER TABLE travellers ADD CONSTRAINT pk_travellers PRIMARY KEY(trav_id);
+
+/* foreign key contraints*/
+
+ALTER TABLE tickets ADD CONSTRAINT fk_travellers FOREIGN KEY(trav_id) references travellers(trav_id);
+
+ALTER TABLE tickets ADD CONSTRAINT fk_holidays FOREIGN KEY(holiday_id) references holidays(holiday_id);
+
+
+/*insert into travellers table*/
+
+INSERT INTO travellers
+            (trav_id,
+             first_name,
+             last_name,
+             email,
+             gender,
+             address,
+             travel_date)
+VALUES      ( seq_num.NEXTVAL,
+             'Caren',
+             'Caen',
+             'ccaen0@nbcnews.com',
+             'Genderfluid',
+              address_type('45 Stuart Parkway','Mendes','Brazil'),
+             '14-OCT-2020' );
+
+INSERT INTO travellers
+            (trav_id,
+             first_name,
+             last_name,
+             email,
+             gender,
+             address,
+             travel_date)
+VALUES      (seq_num.NEXTVAL,
+             'Sebastiano',
+             'Kaesmans',
+             'skaesmans1@pcworld.com',
+             'Female',
+             address_type('44 Graceland Center',
+             'Sananrejo',
+             'Indonesia'),
+             '4-NOV-2020' );
+
+
+
+/*insert into holidays table*/
+
+INSERT INTO holidays
+            (holiday_id,
+             city,
+             country)
+VALUES      (seq_hol.NEXTVAL,
+             'Caucaguita',
+             'Venezuela');
+
+INSERT INTO holidays
+            (holiday_id,
+             city,
+             country)
+VALUES      (seq_hol.NEXTVAL,
+             'Pniewy',
+             'Poland');
+
+
+/*insert into ticket*/
+
+INSERT INTO tickets
+            (
+             ticket_id,
+             trav_id,
+             holiday_id,
+             ticket_price,
+             flight_number,
+             flight_date)
+VALUES      (
+             seq_ticket.NEXTVAL,
+             seq_num.CURRVAL,
+             seq_hol.CURRVAL,
+             630.53,
+             25481,
+             '10-Sep-2020');
+
+INSERT INTO tickets
+            (
+             ticket_id,
+             trav_id,
+             holiday_id,
+             ticket_price,
+             flight_number,
+             flight_date)
+VALUES      (
+             seq_ticket.NEXTVAL,
+             seq_num.CURRVAL,
+             seq_hol.CURRVAL,
+             632.05,
+             25485,
+             '06-Sep-2020');
+
+INSERT INTO tickets
+            (
+             ticket_id,
+             trav_id,
+             holiday_id,
+             ticket_price,
+             flight_number,
+             flight_date)
+VALUES      (
+             seq_ticket.NEXTVAL,
+             seq_num.CURRVAL,
+             seq_hol.CURRVAL,
+             532.05,
+             25478,
+             '25-nov-2021');
+
+INSERT INTO tickets
+            (
+             ticket_id,
+             trav_id,
+             holiday_id,
+             ticket_price,
+             flight_number,
+             flight_date)
+VALUES      (
+             seq_ticket.NEXTVAL,
+             seq_num.CURRVAL,
+             seq_hol.CURRVAL,
+             550.05,
+             25473,
+             '21-Dec-2021');
+
+/*use cursor to create new discount ticket for travellers*/
+DECLARE  
+   ticket_rows number(5,2); 
+BEGIN 
+   UPDATE tickets 
+   SET ticket_price = ticket_price - 30; 
+   IF sql%notfound THEN 
+      dbms_output.put_line('no tickets selected'); 
+   ELSIF sql%found THEN 
+      ticket_rows  := sql%rowcount;
+      dbms_output.put_line( ticket_rows  || ' tickets selected '); 
+   END IF;  
+END; 
+/  
+
+
+/*create ticket discount for travellers*/
+
+CREATE OR REPLACE TRIGGER display_salary_changes 
+BEFORE DELETE OR INSERT OR UPDATE ON tickets 
+FOR EACH ROW 
+WHEN (NEW. ticket_id > 0) 
+DECLARE 
+   tik_diff number; 
+BEGIN 
+   tik_diff := :NEW.ticket_price  - :OLD.ticket_price; 
+   dbms_output.put_line('Old.ticket_price: ' || :OLD.ticket_price); 
+   dbms_output.put_line('New ticket_price: ' || :NEW.ticket_price); 
+   dbms_output.put_line('ticket_price difference: ' || tik_diff); 
+END; 
+/ 
+
+/*create new ticket*/
+
+INSERT INTO tickets
+            (
+             ticket_id,
+             trav_id,
+             holiday_id,
+             ticket_price,
+             flight_number,
+             flight_date)
+VALUES      (
+             seq_ticket.NEXTVAL,
+             seq_num.CURRVAL,
+             seq_hol.CURRVAL,
+             450.05,
+             25473,
+             '29-Dec-2021');
+
+INSERT INTO tickets
+            (
+             ticket_id,
+             trav_id,
+             holiday_id,
+             ticket_price,
+             flight_number,
+             flight_date)
+VALUES      (
+             seq_ticket.NEXTVAL,
+             seq_num.CURRVAL,
+             seq_hol.CURRVAL,
+             490.05,
+             25473,
+             '29-Dec-2021');
+
+
+SELECT * FROM travellers;
+SELECT * FROM holidays;
+SELECT * FROM tickets;
+
+/'query using WHERE*/
+
+SELECT * FROM travellers WHERE trav_id = 1;
+SELECT * FROM holidays WHERE holiday_id = 1;
+
+
+/*update ticket */
+
+UPDATE tickets 
+SET ticket_price = ticket_price + 30 
+WHERE ticket_id = 1; 
+
+UPDATE tickets 
+SET ticket_price = ticket_price + 25 
+WHERE ticket_id = 2; 
+
+
+
+/*select new ticket discount from ticket table*/
+SELECT * FROM tickets;
+
+
+/*This is to demostrate the discount in ticket by deduct 50 euro from 540 euro*/
+
+CREATE FUNCTION trav(tic IN number,dis IN number)
+RETURN number
+IS 
+
+total NUMBER(5);
+
+BEGIN
+total:= tic - dis;
+
+return total;
+
+end;
+/
+
+
+DECLARE
+
+total NUMBER(5);
+
+BEGIN 
+
+total := trav(540,50);
+
+   DBMS_OUTPUT.PUT_LINE('The new discount is: ' || total);    
+END;    
+/    
+
+
+
+/*drop table*/audit_tickets
+
+ALTER TABLE tickets DROP CONSTRAINT fk_travellers;
+ALTER TABLE tickets DROP CONSTRAINT fk_holidays;
+
+ALTER TABLE tickets DROP CONSTRAINT pk_tickets;
+ALTER TABLE travellers DROP CONSTRAINT  pk_travellers;
+ALTER TABLE holidays DROP CONSTRAINT pk_holidays
+
+
+DROP FUNCTION trav;
+DROP TABLE tickets;
+DROP TABLE holidays;
+DROP TABLE travellers;
+DROP TABLE travellers_table;
+DROP TYPE travellers_type;
+DROP TABLE addres;
+DROP TYPE address_type;
+DROP SEQUENCE seq_ticket;
+DROP SEQUENCE seq_hol;
+DROP SEQUENCE seq_num;
+
+purge recyclebin; 
+
+
+

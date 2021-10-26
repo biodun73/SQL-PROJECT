@@ -1,0 +1,125 @@
+/*insert into address_type*/
+INSERT INTO addres(address,
+            city,
+          country
+        )
+          VALUES('45 Stuart Parkway','Mendes','Brazil');
+
+/*insert into travellers table*/
+
+INSERT INTO travellers
+            (trav_id,
+             first_name,
+             last_name,
+             email,
+             gender,
+             address,
+             travel_date)
+VALUES      ( seq_num.NEXTVAL,
+             'Caren',
+             'Caen',
+             'ccaen0@nbcnews.com',
+             'Genderfluid',
+              'addresses',
+             '14-OCT-2020' );
+
+INSERT INTO travellers
+            (trav_id,
+             first_name,
+             last_name,
+             email,
+             gender,
+             address,
+             travel_date)
+VALUES      (seq_num.NEXTVAL,
+             'Sebastiano',
+             'Kaesmans',
+             'skaesmans1@pcworld.com',
+             'Female',
+              'addresses',
+             '4-NOV-2020' );
+
+/*insert into holidays table*/
+
+INSERT INTO holidays
+            (holiday_id,
+             city,
+             country)
+VALUES      (seq_hol.NEXTVAL,
+             'Caucaguita',
+             'Venezuela');
+
+INSERT INTO holidays
+            (holiday_id,
+             city,
+             country)
+VALUES      (seq_hol.NEXTVAL,
+             'Pniewy',
+             'Poland');
+
+
+/*insert into ticket*/
+
+INSERT INTO tickets
+            (
+             ticket_id,
+             trav_id,
+             holiday_id,
+             ticket_price,
+             flight_number,
+             flight_date)
+VALUES      (
+             seq_ticket.NEXTVAL,
+             seq_num.CURRVAL,
+             seq_hol.CURRVAL,
+             630.53,
+             25481,
+             '10-Sep-2020');
+
+INSERT INTO tickets
+            (
+             ticket_id,
+             trav_id,
+             holiday_id,
+             ticket_price,
+             flight_number,
+             flight_date)
+VALUES      (
+             seq_ticket.NEXTVAL,
+             seq_num.CURRVAL,
+             seq_hol.CURRVAL,
+             632.05,
+             25485,
+             '06-Sep-2020');
+
+INSERT INTO tickets
+            (
+             ticket_id,
+             trav_id,
+             holiday_id,
+             ticket_price,
+             flight_number,
+             flight_date)
+VALUES      (
+             seq_ticket.NEXTVAL,
+             seq_num.CURRVAL,
+             seq_hol.CURRVAL,
+             532.05,
+             25478,
+             '25-nov-2021');
+
+INSERT INTO tickets
+            (
+             ticket_id,
+             trav_id,
+             holiday_id,
+             ticket_price,
+             flight_number,
+             flight_date)
+VALUES      (
+             seq_ticket.NEXTVAL,
+             seq_num.CURRVAL,
+             seq_hol.CURRVAL,
+             550.05,
+             25473,
+             '21-Dec-2021');

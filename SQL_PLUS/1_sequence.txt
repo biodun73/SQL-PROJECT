@@ -1,0 +1,11 @@
+SET SERVEROUTPUT ON;
+
+/*create sequence*/
+
+CREATE SEQUENCE seq_num;
+
+CREATE SEQUENCE seq_hol;
+
+CREATE SEQUENCE seq_ticket;
+
+

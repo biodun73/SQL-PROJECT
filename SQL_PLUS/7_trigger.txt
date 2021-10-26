@@ -1,0 +1,19 @@
+
+/*create ticket discount for travellers*/
+
+CREATE OR REPLACE TRIGGER display_salary_changes 
+BEFORE DELETE OR INSERT OR UPDATE ON tickets 
+FOR EACH ROW 
+WHEN (NEW. ticket_id > 0) 
+DECLARE 
+   tik_diff number; 
+BEGIN 
+   tik_diff := :NEW.ticket_price  - :OLD.ticket_price; 
+   dbms_output.put_line('Old.ticket_price: ' || :OLD.ticket_price); 
+   dbms_output.put_line('New ticket_price: ' || :NEW.ticket_price); 
+   dbms_output.put_line('ticket_price difference: ' || tik_diff); 
+END; 
+/ 
+
+
+

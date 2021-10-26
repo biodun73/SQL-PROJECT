@@ -1,0 +1,10 @@
+
+ALTER TABLE tickets ADD CONSTRAINT pk_tickets PRIMARY KEY(ticket_id);
+ALTER TABLE holidays ADD CONSTRAINT pk_holidays PRIMARY KEY(holiday_id);
+ALTER TABLE travellers ADD CONSTRAINT pk_travellers PRIMARY KEY(trav_id);
+
+/* foreign key contraints*/
+
+ALTER TABLE tickets ADD CONSTRAINT fk_travellers FOREIGN KEY(trav_id) references travellers(trav_id);
+
+ALTER TABLE tickets ADD CONSTRAINT fk_holidays FOREIGN KEY(holiday_id) references holidays(holiday_id);

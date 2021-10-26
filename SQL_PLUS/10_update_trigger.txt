@@ -1,0 +1,10 @@
+
+/*update ticket */
+
+UPDATE tickets 
+SET ticket_price = ticket_price + 30 
+WHERE ticket_id = 1; 
+
+UPDATE tickets 
+SET ticket_price = ticket_price + 25 
+WHERE ticket_id = 2; 

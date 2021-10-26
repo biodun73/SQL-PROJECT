@@ -1,0 +1,75 @@
+
+/*create address type for traveller table */
+
+CREATE TYPE address_type AS OBJECT(
+       address VARCHAR2(50),
+       city VARCHAR2(50),
+       country VARCHAR2(50)
+);
+/
+     
+CREATE TYPE travellers_type
+AS
+    OBJECT
+    (
+         firstname  VARCHAR2(20),
+         lastname  VARCHAR2(20),
+         email  VARCHAR2(50),
+         gender  VARCHAR2(50)
+  );
+/
+
+/*insert data into table addresses*/
+
+INSERT INTO address_type
+(
+       address,
+       city,
+       country
+
+)
+   VALUES
+(  
+ '45 Stuart Parkway','Mendes','Brazil'
+);
+
+
+INSERT INTO address_type
+(
+       address,
+       city,
+       country
+
+)
+   VALUES
+(
+   '44 Graceland Center','Sananrejo','Indonesia'
+);
+
+INSERT INTO travellers_type
+(
+         firstname,
+         lastname,
+         email,
+         gender
+
+)
+   VALUES
+(
+     'Caren','Caen','ccaen0@nbcnews.com','Genderfluid'
+);
+
+INSERT INTO travellers_type
+(
+         firstname,
+         lastname,
+         email,
+         gender
+
+)
+   VALUES
+(
+     'Sebastiano','Kaesmans','skaesmans1@pcworld.com','Female'
+);
+
+ SELETE city,country FROM addresses;

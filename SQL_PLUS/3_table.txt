@@ -1,0 +1,31 @@
+CREATE TABLE travellers
+  (
+     trav_id     NUMBER(5),
+     first_name  VARCHAR2(50),
+     last_name   VARCHAR2(50),
+     email       VARCHAR2(50),
+     gender      VARCHAR2(50),
+     address     addresses,
+     travel_date DATE
+  );
+
+/*create holiday table*/
+
+CREATE TABLE holidays
+  (
+     holiday_id NUMBER(5),
+     city          VARCHAR(50),
+     country       VARCHAR(50)
+  );
+/*create table tickets*/
+
+CREATE TABLE tickets
+  (
+             ticket_id NUMBER(5),
+             trav_id NUMBER(5),
+             holiday_id NUMBER(5),
+             ticket_price NUMBER(5,2),
+             flight_number VARCHAR2(255),
+             flight_date DATE
+ );
+
